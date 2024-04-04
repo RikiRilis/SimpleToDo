@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.todo.TodoFragment">
+
+    <LinearLayout style="@style/Fragments_Styles3">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp">
+
+            <TextView
+                android:id="@+id/tvTodoTitle"
+                style="@style/Fragments_Styles"
+                android:layout_width="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/to_do"
+                tools:ignore="InefficientWeight" />
+
+            <LinearLayout
+                android:layout_width="1dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="8dp"
+                android:background="@color/top_txt2"
+                android:orientation="horizontal" />
+
+            <TextView
+                android:id="@+id/tvTodoTitleList"
+                style="@style/Fragments_Styles"
+                android:layout_width="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:singleLine="true"
+                tools:ignore="InefficientWeight"
+                tools:text="Lista para un año aaa aaaaa" />
+
+            <TextView
+                android:id="@+id/tvTodosCount"
+                style="@style/Fragments_Styles2"
+                tools:text="0 Pending(s)" />
+
+            <LinearLayout
+                android:id="@+id/ivTodoFilter"
+                android:layout_width="58dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="-20dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="@string/all"
+                    android:src="@drawable/ic_filter" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTodoEmptyList"
+            style="@style/Fragments_Styles2"
+            android:text="@string/empty_todo_list_desc"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvTodoEmptyPedingList"
+            style="@style/Fragments_Styles2"
+            android:text="@string/empty_todo_list_desc_pending"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvTodoEmptyCompletedList"
+            style="@style/Fragments_Styles2"
+            android:text="@string/empty_todo_list_desc_completed"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTodosElements"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="always" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/todoDeleteCompleted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="88dp"
+        android:backgroundTint="@color/second_action_button"
+        android:contentDescription="@string/to_do"
+        android:src="@drawable/ic_list_delete_completed"
+        app:borderWidth="0dp"
+        app:elevation="0dp"
+        app:fabCustomSize="40dp"
+        app:maxImageSize="16dp"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+        app:tint="@color/red" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addToDoBtn"
+        style="@style/Action_Buttons_Styles"
+        android:contentDescription="@string/to_do"
+        app:borderWidth="0dp"
+        app:elevation="0dp"
+        app:fabSize="auto"
+        app:maxImageSize="34dp"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+        app:tint="@color/secondaryColor" />
+
+</FrameLayout>

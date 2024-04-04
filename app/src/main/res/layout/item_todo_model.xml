@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="78dp"
+    android:layout_marginVertical="2dp"
+    app:cardBackgroundColor="@color/select_item"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        tools:ignore="UselessParent">
+
+        <ImageView
+            android:id="@+id/ivTodoDelete"
+            android:layout_width="18dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginEnd="18dp"
+            android:contentDescription="@string/delete"
+            android:src="@drawable/ic_close"
+            app:tint="@color/red" />
+
+        <LinearLayout
+            android:id="@+id/llCheckedZone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            tools:ignore="UselessParent">
+
+            <TextView
+                android:id="@+id/tvTodoDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/main_txt4"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="New Registry Because Amelia Is So Beatyfuñ" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                tools:ignore="UseCompoundDrawables">
+
+                <TextView
+                    android:id="@+id/tvTodoTimestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/main_txt10"
+                    android:textSize="11sp"
+                    tools:text="Created: 3/8/2024 15:65" />
+
+                <ImageView
+                    android:id="@+id/ivTodoCompletedImage"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="6dp"
+                    android:contentDescription="@string/saved"
+                    android:src="@drawable/ic_todo"
+                    android:visibility="gone"
+                    app:tint="@color/green" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

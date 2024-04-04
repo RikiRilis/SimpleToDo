@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/shape_bottom_dialog"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center|top"
+        android:contentDescription="@string/dialog"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_minus"
+        app:tint="@color/top_txt2" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        tools:ignore="UseCompoundDrawables">
+
+        <LinearLayout
+            android:id="@+id/ivLanguagesDialogClose"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="20dp"
+            tools:ignore="RtlSymmetry">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:contentDescription="@string/close"
+                android:src="@drawable/ic_close"
+                app:tint="@color/top_txt2" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/createText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginVertical="12dp"
+            android:layout_weight="1"
+            android:text="@string/languages"
+            android:textColor="@color/top_txt2"
+            android:textSize="28sp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="8dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <RadioGroup
+            android:id="@+id/rgLanguages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp">
+
+            <RadioButton
+                android:id="@+id/rbLangEnglish"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:buttonTint="@color/top_txt3"
+                android:contentDescription="@string/en_desc"
+                android:paddingHorizontal="12dp"
+                android:text="@string/english"
+                android:textColor="@color/main_txt4"
+                app:buttonTint="@color/top_txt3" />
+
+            <RadioButton
+                android:id="@+id/rbLangSpanish"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:buttonTint="@color/top_txt3"
+                android:contentDescription="@string/es_desc"
+                android:paddingHorizontal="12dp"
+                android:text="@string/spanish"
+                android:textColor="@color/main_txt4"
+                app:buttonTint="@color/top_txt3" />
+        </RadioGroup>
+
+    </ScrollView>
+
+</LinearLayout>

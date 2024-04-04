@@ -1,0 +1,74 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.SimpleToDo" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/top</item>
+        <item name="android:navigationBarColor">@color/top</item>
+        <item name="android:indeterminateTint">@color/accent</item>
+        <item name="android:colorEdgeEffect">@color/main_bg4</item>
+        <item name="android:textColorHighlight">@color/main_bg4</item>
+        <item name="android:colorControlHighlight">@color/main_bg4</item>
+        <item name="android:colorPressedHighlight">@color/main_bg4</item>
+        <item name="android:colorFocusedHighlight">@color/main_bg4</item>
+        <item name="android:scrollbarThumbVertical">@color/gray</item>
+    </style>
+
+    <style name="Theme.SimpleToDo" parent="Base.Theme.SimpleToDo" />
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/main_bg2</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground_108px</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/Base.Theme.SimpleToDo</item>
+    </style>
+
+    <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/main_bg4</item>
+    </style>
+
+    <style name="Fragments_Styles">
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/top_txt2</item>
+        <item name="android:paddingVertical">16dp</item>
+    </style>
+
+    <style name="Fragments_Styles2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textColor">@color/main_txt10</item>
+        <item name="android:paddingVertical">16dp</item>
+    </style>
+
+    <style name="Fragments_Styles3">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_marginBottom">0.5dp</item>
+    </style>
+
+    <style name="Action_Buttons_Styles">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">end|bottom</item>
+        <item name="android:layout_margin">20dp</item>
+        <item name="android:backgroundTint">@color/primaryColor</item>
+        <item name="android:src">@drawable/ic_plus</item>
+    </style>
+
+    <style name="Bottom_Sheet_Dialog_Anim">
+        <item name="android:windowEnterAnimation">@anim/slide_up_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_up_out</item>
+    </style>
+
+    <style name="Popup_Menu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/shape_floating_menu</item>
+        <item name="android:popupElevation">4dp</item>
+    </style>
+</resources>
