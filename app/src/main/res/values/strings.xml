@@ -55,11 +55,11 @@
     <string name="list_name">List name</string>
     <string name="settings_to_do">Settings | To-Do</string>
     <string name="restore">Restore</string>
-    <string name="todo_restore_desc">Restore a list from your internal storage.</string>
+    <string name="todo_restore_desc">Restore your lists from your internal storage.</string>
     <string name="todo_backup_desc">Save your lists in a safe place in your internal storage.</string>
     <string name="backup">Backup</string>
     <string name="settings_todo_desc">Backup and restore your lists.</string>
-    <string name="list_restored">List restored!</string>
-    <string name="list_backup_warn">You cannot modify the lists from here!</string>
-    <string name="list_backup_warn_2">This list is empty!</string>
+    <string name="list_restored">Lists restored!</string>
+    <string name="list_backup_warn">Lists are empty!</string>
+    <string name="list_restore_warn">Wrong archive!</string>
 </resources>

@@ -4,22 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.Gravity
-import android.view.ViewGroup
-import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rilisentertainment.simpletodo.R
@@ -27,28 +16,30 @@ import com.rilisentertainment.simpletodo.data.usecase.VibrationUtil
 import com.rilisentertainment.simpletodo.databinding.ActivityTodoSettingsBinding
 import com.rilisentertainment.simpletodo.domain.TodoInfo
 import com.rilisentertainment.simpletodo.domain.TodoList
+import com.rilisentertainment.simpletodo.ui.home.MainActivity
 import com.rilisentertainment.simpletodo.ui.todo.TodoListViewModel
 import com.rilisentertainment.simpletodo.ui.todo.TodoViewModel
-import com.rilisentertainment.simpletodo.ui.todo.adapter.TodoListAdapter
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 
 @Suppress("DEPRECATION")
+@AndroidEntryPoint
 class TodoSettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTodoSettingsBinding
-    private lateinit var todoListAdapter: TodoListAdapter
 
     companion object {
         const val REQUEST_CODE_PICK_FILE = 100
         const val REQUEST_CODE_PICK_JSON = 111
+        const val CURRENT_LIST = "current_list"
     }
 
     private val todoViewModel by viewModels<TodoViewModel>()
     private val todoListViewModel by viewModels<TodoListViewModel>()
-
-    private var listToSave: MutableList<TodoInfo> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +73,7 @@ class TodoSettingsActivity : AppCompatActivity() {
                         json, typeToken
                     ) ?: todoViewModel.getTodosList()
 
-                    listRestored(newList)
+                    listRestoredCheck(newList)
 
                     Toast.makeText(
                         context,
@@ -96,8 +87,39 @@ class TodoSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun listRestored(list: MutableList<TodoInfo>) {
-        Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
+    private fun listRestoredCheck(list: MutableList<TodoInfo>) {
+        if (list[0].type == "TodoList" && list.all { it.type.isNotEmpty() }) {
+            restoreList(list)
+        } else {
+            Toast.makeText(
+                this,
+                this.getString(
+                    R.string.list_restore_warn
+                ),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun restoreList(list: MutableList<TodoInfo>) {
+        val newTodoListInfo: MutableList<TodoList> = todoListViewModel.getTodosList()
+        todoViewModel.updateAllList(list)
+        todoViewModel.getTodosList().forEach { item ->
+            if (
+                !todoListViewModel.getTodosList().any { it.title == item.list } &&
+                !newTodoListInfo.any { it.title == item.list }
+            ) {
+                newTodoListInfo.add(TodoList(item.list))
+            }
+        }
+        todoListViewModel.updateAllList(newTodoListInfo)
+        todoViewModel.saveTodosToDataStore(this)
+        todoListViewModel.saveLists(this)
+        CoroutineScope(Dispatchers.IO).launch {
+            MainActivity.DataManager(this@TodoSettingsActivity).saveStrings(
+                CURRENT_LIST, todoViewModel.getTodosList()[0].list
+            )
+        }
     }
 
     private fun restoreTodosList() {
@@ -105,7 +127,6 @@ class TodoSettingsActivity : AppCompatActivity() {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "application/json"
         }
-
         startActivityForResult(intent, REQUEST_CODE_PICK_JSON)
     }
 
@@ -118,14 +139,14 @@ class TodoSettingsActivity : AppCompatActivity() {
         intent.type = "application/json"
         intent.putExtra(
             Intent.EXTRA_TITLE,
-            "${getFilteredList()[0].list}[${dateFormat.format(currentDate)}].json"
+            "todoLists_backup_[${dateFormat.format(currentDate)}].json"
         )
         startActivityForResult(intent, REQUEST_CODE_PICK_FILE)
     }
 
     private fun writeJsonToFile(outputStream: java.io.OutputStream) {
         try {
-            val json = Gson().toJson(getFilteredList())
+            val json = Gson().toJson(todoViewModel.getTodosList())
             outputStream.use { stream ->
                 val file = File(outputStream.toString())
                 if (file.exists()) {
@@ -138,87 +159,6 @@ class TodoSettingsActivity : AppCompatActivity() {
             e.printStackTrace()
             Toast.makeText(this, this.getString(R.string.backup_error), Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun initUIListState() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                todoListViewModel.list.collect {
-                    todoListAdapter.updateList(it)
-                }
-            }
-        }
-    }
-
-    private fun showBackupDialog() {
-        val dialog = BottomSheetDialog(this)
-        dialog.window!!.requestFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_bottom_save_lists)
-        dialog.behavior.peekHeight = 800
-        dialog.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-        val closeBtn: LinearLayout = dialog.findViewById(R.id.ivBottomDialogClose)!!
-        val rvTodoLists: RecyclerView = dialog.findViewById(R.id.rvTodoLists)!!
-
-        todoListAdapter = TodoListAdapter(
-            onItemSelected = {
-                listSelected(it)
-            },
-
-            onItemRemove = {
-                Toast.makeText(
-                    this,
-                    this.getString(R.string.list_backup_warn),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        )
-
-        initUIListState()
-
-        rvTodoLists.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = todoListAdapter
-        }
-
-        closeBtn.setOnClickListener {
-            val animation: Animation =
-                AnimationUtils.loadAnimation(this, R.anim.fade_in)
-            it.startAnimation(animation)
-
-            dialog.dismiss()
-            dialog.hide()
-        }
-
-        dialog.show()
-        dialog.window!!.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        dialog.window!!.setBackgroundDrawableResource(R.color.transparent)
-        dialog.window!!.attributes.windowAnimations = R.style.Bottom_Sheet_Dialog_Anim
-        dialog.window!!.setGravity(Gravity.BOTTOM)
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun listSelected(list: String) {
-        listToSave.clear()
-        todoViewModel.getTodosList().forEach { item ->
-            if (item.list == list) {
-                listToSave.add(item)
-            }
-        }
-
-        if (listToSave.isNotEmpty()) backupTodosList()
-        else Toast.makeText(
-            this,
-            this.getString(R.string.list_backup_warn_2),
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    private fun getFilteredList(): MutableList<TodoInfo> {
-        return listToSave
     }
 
     private fun initListeners() {
@@ -234,7 +174,15 @@ class TodoSettingsActivity : AppCompatActivity() {
             it.startAnimation(animation)
             VibrationUtil.vibrate1(this)
 
-            showBackupDialog()
+            if (todoViewModel.getTodosList().isEmpty()) {
+                Toast.makeText(
+                    this,
+                    this.getString(R.string.list_backup_warn),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                backupTodosList()
+            }
         }
 
         binding.llSettingsTodoRestore.setOnClickListener {

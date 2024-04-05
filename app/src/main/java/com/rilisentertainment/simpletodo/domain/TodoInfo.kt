@@ -7,5 +7,6 @@ data class TodoInfo(
     var timestamp: String = "Default",
     var done: Boolean = false,
     val list: String = "Default",
+    val type: String = "TodoList",
     val id: String = UUID.randomUUID().toString()
 )

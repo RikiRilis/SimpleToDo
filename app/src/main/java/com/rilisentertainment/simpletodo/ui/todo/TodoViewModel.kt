@@ -3,7 +3,6 @@ package com.rilisentertainment.simpletodo.ui.todo
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.rilisentertainment.simpletodo.domain.TodoInfo
 import com.rilisentertainment.simpletodo.ui.home.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,11 +29,6 @@ class TodoViewModel @Inject constructor() : ViewModel() {
     }
 
     fun updateAllList(list: MutableList<TodoInfo>) {
-        todosList = list
-        _todos.value = todosList
-    }
-
-    fun restoreList(list: MutableList<TodoInfo>) {
         todosList = list
         _todos.value = todosList
     }
