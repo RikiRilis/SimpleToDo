@@ -17,6 +17,11 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.rilisentertainment.simpletodo.data.usecase.VibrationUtil
@@ -32,16 +37,17 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySettingsBinding
-
-    private var firstTimeFlag = true
-    private var currentLanguage: String = "en"
-
     companion object {
         const val SWITCH_VIBRATE = "switch_vibrate"
         const val THEME = "theme"
         const val LANGUAGE = "language"
     }
+
+    private lateinit var binding: ActivitySettingsBinding
+
+    private var firstTimeFlag = true
+    private var currentLanguage: String = "en"
+    private var interstitialAdMob: InterstitialAd? = null
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +58,7 @@ class SettingsActivity : AppCompatActivity() {
         currentLanguage = resources.configuration.locales[0].language
 
         CoroutineScope(Dispatchers.IO).launch {
-            MainActivity.DataManager(binding.ivSettingsBack.context).getSettings()
+            MainActivity.DataManager(this@SettingsActivity).getSettings()
                 .filter { firstTimeFlag }.collect { settingsModel ->
                     runOnUiThread {
                         binding.sSettingsVibration.isChecked = settingsModel.vibration
@@ -83,6 +89,29 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun initUI() {
         initListeners()
+        initAds()
+    }
+
+    private fun initAds() {
+        val adRequest = AdRequest.Builder().build()
+
+        InterstitialAd.load(
+            this,
+            MainActivity.INTERSTITIAL_ID,
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    interstitialAdMob = interstitialAd
+                }
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    interstitialAdMob = null
+                }
+            }
+        )
+    }
+
+    private fun showAds() {
+        interstitialAdMob?.show(this)
     }
 
     private fun openPrivacy() {
@@ -185,7 +214,14 @@ class SettingsActivity : AppCompatActivity() {
 
             val animation: Animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
             it.startAnimation(animation)
+            dialog.dismiss()
             dialog.hide()
+
+            val randomNum = (1..100).random()
+            if (randomNum >= 50) {
+                showAds()
+                initAds()
+            }
         }
 
         dialog.show()
@@ -275,8 +311,6 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun initListeners() {
-        val context: Context = binding.ivSettingsBack.context
-
         binding.ivSettingsBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
             val animation: Animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
@@ -286,17 +320,17 @@ class SettingsActivity : AppCompatActivity() {
         binding.llSettingsMode.setOnClickListener {
             val animation: Animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
             it.startAnimation(animation)
-            VibrationUtil.vibrate1(context)
+            VibrationUtil.vibrate1(this)
 
-            showThemeDialog(context)
+            showThemeDialog(this)
         }
 
         binding.llSettingsLanguage.setOnClickListener {
             val animation: Animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
             it.startAnimation(animation)
-            VibrationUtil.vibrate1(context)
+            VibrationUtil.vibrate1(this)
 
-            openLanguageDialog(context)
+            openLanguageDialog(this)
         }
 
         binding.llSettingsVibration.setOnClickListener {
@@ -308,14 +342,14 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.sSettingsVibration.setOnCheckedChangeListener { _, value ->
             CoroutineScope(Dispatchers.IO).launch {
-                MainActivity.DataManager(context).saveSwitches(SWITCH_VIBRATE, value)
+                MainActivity.DataManager(this@SettingsActivity).saveSwitches(SWITCH_VIBRATE, value)
             }
         }
 
         binding.llSettingsPrivacy.setOnClickListener {
             val animation: Animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
             it.startAnimation(animation)
-            VibrationUtil.vibrate1(context)
+            VibrationUtil.vibrate1(this)
 
             openPrivacy()
         }
@@ -323,9 +357,17 @@ class SettingsActivity : AppCompatActivity() {
         binding.llSettingsTodo.setOnClickListener {
             val animation: Animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
             it.startAnimation(animation)
-            VibrationUtil.vibrate1(context)
+            VibrationUtil.vibrate1(this)
 
             openTodoSettings()
+        }
+
+        interstitialAdMob?.fullScreenContentCallback = object: FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+            }
+            override fun onAdShowedFullScreenContent() {
+                interstitialAdMob = null
+            }
         }
     }
 }

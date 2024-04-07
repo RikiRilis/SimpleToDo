@@ -62,4 +62,8 @@
     <string name="list_restored">Lists restored!</string>
     <string name="list_backup_warn">Lists are empty!</string>
     <string name="list_restore_warn">Wrong archive!</string>
+    <string name="reminder_notifications">Reminder notifications</string>
+    <string name="pending_tasks">You have pending task(s):</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_desc">Turn on/Turn off notifications.</string>
 </resources>

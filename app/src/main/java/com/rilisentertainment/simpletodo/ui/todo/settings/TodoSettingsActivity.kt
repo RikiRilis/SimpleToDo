@@ -9,6 +9,11 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rilisentertainment.simpletodo.R
@@ -30,16 +35,18 @@ import java.util.Date
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
 class TodoSettingsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityTodoSettingsBinding
-
     companion object {
         const val REQUEST_CODE_PICK_FILE = 100
         const val REQUEST_CODE_PICK_JSON = 111
         const val CURRENT_LIST = "current_list"
     }
 
+    private lateinit var binding: ActivityTodoSettingsBinding
+
     private val todoViewModel by viewModels<TodoViewModel>()
     private val todoListViewModel by viewModels<TodoListViewModel>()
+
+    private var interstitialAdMob: InterstitialAd? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +58,29 @@ class TodoSettingsActivity : AppCompatActivity() {
 
     private fun initUI() {
         initListeners()
+        initAds()
+    }
+
+    private fun initAds() {
+        val adRequest = AdRequest.Builder().build()
+
+        InterstitialAd.load(
+            this,
+            MainActivity.INTERSTITIAL_ID,
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    interstitialAdMob = interstitialAd
+                }
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    interstitialAdMob = null
+                }
+            }
+        )
+    }
+
+    private fun showAds() {
+        interstitialAdMob?.show(this)
     }
 
     @Deprecated("Deprecated in Java")
@@ -61,6 +91,11 @@ class TodoSettingsActivity : AppCompatActivity() {
                 val outputStream = contentResolver.openOutputStream(uri)
                 outputStream?.use { stream ->
                     writeJsonToFile(stream)
+                    val randomNum = (1..100).random()
+                    if (randomNum >= 50) {
+                        showAds()
+                        initAds()
+                    }
                 }
             }
         } else if (requestCode == REQUEST_CODE_PICK_JSON && resultCode == Activity.RESULT_OK) {
@@ -68,12 +103,18 @@ class TodoSettingsActivity : AppCompatActivity() {
                 contentResolver.openInputStream(uri)?.use { inputStream ->
                     val context = this
                     val json = inputStream.bufferedReader().use { it.readText() }
-                    val typeToken = object : TypeToken<MutableList<TodoInfo>>() {}.type
+                    val typeToken = object : TypeToken<List<TodoInfo>>() {}.type
                     val newList = Gson().fromJson(
                         json, typeToken
-                    ) ?: todoViewModel.getTodosList()
+                    ) ?: todoViewModel.getList()
 
                     listRestoredCheck(newList)
+
+                    val randomNum = (1..100).random()
+                    if (randomNum >= 50) {
+                        showAds()
+                        initAds()
+                    }
 
                     Toast.makeText(
                         context,
@@ -87,7 +128,7 @@ class TodoSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun listRestoredCheck(list: MutableList<TodoInfo>) {
+    private fun listRestoredCheck(list: List<TodoInfo>) {
         if (list[0].type == "TodoList" && list.all { it.type.isNotEmpty() }) {
             restoreList(list)
         } else {
@@ -101,10 +142,10 @@ class TodoSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun restoreList(list: MutableList<TodoInfo>) {
+    private fun restoreList(list: List<TodoInfo>) {
         val newTodoListInfo: MutableList<TodoList> = todoListViewModel.getTodosList()
         todoViewModel.updateAllList(list)
-        todoViewModel.getTodosList().forEach { item ->
+        todoViewModel.getList().forEach { item ->
             if (
                 !todoListViewModel.getTodosList().any { it.title == item.list } &&
                 !newTodoListInfo.any { it.title == item.list }
@@ -117,7 +158,7 @@ class TodoSettingsActivity : AppCompatActivity() {
         todoListViewModel.saveLists(this)
         CoroutineScope(Dispatchers.IO).launch {
             MainActivity.DataManager(this@TodoSettingsActivity).saveStrings(
-                CURRENT_LIST, todoViewModel.getTodosList()[0].list
+                CURRENT_LIST, todoViewModel.getList()[0].list
             )
         }
     }
@@ -146,7 +187,7 @@ class TodoSettingsActivity : AppCompatActivity() {
 
     private fun writeJsonToFile(outputStream: java.io.OutputStream) {
         try {
-            val json = Gson().toJson(todoViewModel.getTodosList())
+            val json = Gson().toJson(todoViewModel.getList())
             outputStream.use { stream ->
                 val file = File(outputStream.toString())
                 if (file.exists()) {
@@ -174,7 +215,7 @@ class TodoSettingsActivity : AppCompatActivity() {
             it.startAnimation(animation)
             VibrationUtil.vibrate1(this)
 
-            if (todoViewModel.getTodosList().isEmpty()) {
+            if (todoViewModel.getList().isEmpty()) {
                 Toast.makeText(
                     this,
                     this.getString(R.string.list_backup_warn),
@@ -191,6 +232,14 @@ class TodoSettingsActivity : AppCompatActivity() {
             VibrationUtil.vibrate1(this)
 
             restoreTodosList()
+        }
+
+        interstitialAdMob?.fullScreenContentCallback = object: FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+            }
+            override fun onAdShowedFullScreenContent() {
+                interstitialAdMob = null
+            }
         }
     }
 }

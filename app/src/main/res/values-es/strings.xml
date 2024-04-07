@@ -62,4 +62,8 @@
     <string name="list_restored">¡Listas restauradas!</string>
     <string name="list_backup_warn">¡Las listas están vacías!</string>
     <string name="list_restore_warn">¡Archivo incorrecto!</string>
+    <string name="reminder_notifications">Notificaciones de recordatorio</string>
+    <string name="pending_tasks">Tienes tarea(s) pendiente(s):</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="notifications_desc">Activa/Desactiva las notificaciones.</string>
 </resources>

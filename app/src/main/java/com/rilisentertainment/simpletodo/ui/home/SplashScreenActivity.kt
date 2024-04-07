@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 @SuppressLint("CustomSplashScreen")
 class SplashScreenActivity : AppCompatActivity() {
     private var firstTimeFlag = true
-    private var vibrationSettingsStore: Boolean = true
     private var themeSettingsStore: String = "System default"
     private var languageSettingsStore: String = "en"
     private var currentLanguage: String = ""
@@ -29,10 +28,10 @@ class SplashScreenActivity : AppCompatActivity() {
         currentLanguage = resources.configuration.locales[0].language
 
         CoroutineScope(Dispatchers.IO).launch {
-            MainActivity.DataManager(this@SplashScreenActivity).getSettings().filter { firstTimeFlag }
+            MainActivity.DataManager(this@SplashScreenActivity).getSettings()
+                .filter { firstTimeFlag }
                 .collect { settingsModel ->
                     runOnUiThread {
-                        vibrationSettingsStore = settingsModel.vibration
                         themeSettingsStore = settingsModel.theme
                         when (themeSettingsStore) {
                             "System default" -> darkModeAuto()
@@ -43,26 +42,29 @@ class SplashScreenActivity : AppCompatActivity() {
                         languageSettingsStore = settingsModel.language
                         CoroutineScope(Dispatchers.IO).launch {
                             when (languageSettingsStore) {
-                                "en" -> MainActivity.DataManager(this@SplashScreenActivity).setLocale(
-                                    this@SplashScreenActivity,
-                                    languageSettingsStore,
-                                    "language",
-                                    "en"
-                                )
+                                "en" -> MainActivity.DataManager(this@SplashScreenActivity)
+                                    .setLocale(
+                                        this@SplashScreenActivity,
+                                        languageSettingsStore,
+                                        "language",
+                                        "en"
+                                    )
 
-                                "es" -> MainActivity.DataManager(this@SplashScreenActivity).setLocale(
-                                    this@SplashScreenActivity,
-                                    languageSettingsStore,
-                                    "language",
-                                    "es"
-                                )
+                                "es" -> MainActivity.DataManager(this@SplashScreenActivity)
+                                    .setLocale(
+                                        this@SplashScreenActivity,
+                                        languageSettingsStore,
+                                        "language",
+                                        "es"
+                                    )
 
-                                else -> MainActivity.DataManager(this@SplashScreenActivity).setLocale(
-                                    this@SplashScreenActivity,
-                                    languageSettingsStore,
-                                    "language",
-                                    currentLanguage
-                                )
+                                else -> MainActivity.DataManager(this@SplashScreenActivity)
+                                    .setLocale(
+                                        this@SplashScreenActivity,
+                                        languageSettingsStore,
+                                        "language",
+                                        currentLanguage
+                                    )
                             }
                         }
 

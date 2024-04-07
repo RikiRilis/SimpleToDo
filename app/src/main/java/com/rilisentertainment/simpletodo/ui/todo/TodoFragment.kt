@@ -26,6 +26,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.textfield.TextInputEditText
@@ -66,6 +71,7 @@ class TodoFragment : Fragment() {
     private var arrayOfLists: MutableList<TodoList> = mutableListOf()
     private var currentFilter = categories[0]
     private var currentList = "Default"
+    private var interstitialAdMob: InterstitialAd? = null
 
     companion object {
         const val CURRENT_FILTER = "current_filter"
@@ -83,11 +89,34 @@ class TodoFragment : Fragment() {
         initUIState()
         initList()
         initListeners()
+        initAds()
+    }
+
+    private fun initAds() {
+        val adRequest = AdRequest.Builder().build()
+
+        InterstitialAd.load(
+            requireContext(),
+            MainActivity.INTERSTITIAL_ID,
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    interstitialAdMob = interstitialAd
+                }
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    interstitialAdMob = null
+                }
+            }
+        )
+    }
+
+    private fun showAds() {
+        interstitialAdMob?.show(requireActivity())
     }
 
     private fun chargeList() {
         CoroutineScope(Dispatchers.IO).launch {
-            val todosListStored: MutableList<TodoInfo> =
+            val todosListStored: List<TodoInfo> =
                 MainActivity.DataManager(requireContext()).getTodosListFromDataStore()
             if (todosListStored.isNotEmpty()) todoViewModel.updateAllList(todosListStored)
 
@@ -109,7 +138,7 @@ class TodoFragment : Fragment() {
                     todoAdapter.updateList(it)
 
                     pendingCount.clear()
-                    todoViewModel.getTodosList().forEach { item ->
+                    todoViewModel.getList().forEach { item ->
                         if (!item.done && item.list == currentList) {
                             pendingCount.add(item)
                         }
@@ -145,8 +174,8 @@ class TodoFragment : Fragment() {
             adapter = todoAdapter
         }
 
-        filteredList.addAll(todoViewModel.getTodosList())
-        pendingCount.addAll(todoViewModel.getTodosList())
+        filteredList.addAll(todoViewModel.getList())
+        pendingCount.addAll(todoViewModel.getList())
 
         CoroutineScope(Dispatchers.IO).launch {
             val filter = MainActivity.DataManager(requireContext()).getStrings(CURRENT_FILTER)
@@ -171,7 +200,7 @@ class TodoFragment : Fragment() {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun showDialogAddTodo() {
+    private fun showDialogAddTodo(flag: String = "") {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_add_todo)
         dialog.window!!.setBackgroundDrawableResource(R.color.transparent)
@@ -191,6 +220,7 @@ class TodoFragment : Fragment() {
         val ivAddNewList: ImageView = dialog.findViewById(R.id.ivAddNewList)
         val acListAutoComplete: AutoCompleteTextView = dialog.findViewById(R.id.acListAutoComplete)
         acListAutoComplete.setText(currentList)
+        if (flag.isNotEmpty()) tiDescInput.setText(flag)
 
         val list = mutableListOf<String>()
         arrayOfLists.forEach { item ->
@@ -208,9 +238,9 @@ class TodoFragment : Fragment() {
             }
 
         ivAddNewList.setOnClickListener {
-            showAddNewListDialog()
             dialog.dismiss()
             dialog.hide()
+            showAddNewListDialog(tiDescInput.text.toString().trim())
         }
 
         addBtn.setOnClickListener {
@@ -227,12 +257,11 @@ class TodoFragment : Fragment() {
                         list = itemSelected
                     )
                 )
-
-                todoAdapter.updateList(todoViewModel.getTodosList())
-                todoAdapter.notifyItemInserted(todoViewModel.getTodosList().size - 1)
+                todoAdapter.updateList(todoViewModel.getList())
                 todoViewModel.saveTodosToDataStore(requireContext())
 
-                initUIState()
+                selectFilter()
+                dialog.dismiss()
                 dialog.hide()
             } else {
                 VibrationUtil.vibrate2(requireContext())
@@ -243,7 +272,7 @@ class TodoFragment : Fragment() {
         dialog.show()
     }
 
-    private fun showAddNewListDialog() {
+    private fun showAddNewListDialog(flag: String = "") {
         val dialog = BottomSheetDialog(requireContext())
         dialog.window!!.requestFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_bottom_add_list)
@@ -270,10 +299,24 @@ class TodoFragment : Fragment() {
                     )
                     todoListViewModel.saveLists(requireContext())
                     arrayOfLists = todoListViewModel.getTodosList()
+                    currentList = etInput.text.toString().trim()
+                    binding.tvTodoTitleList.text = currentList
+                    CoroutineScope(Dispatchers.IO).launch {
+                        MainActivity.DataManager(requireContext()).saveStrings(
+                            CURRENT_LIST,
+                            currentList
+                        )
+                    }
 
-                    showDialogAddTodo()
+                    showDialogAddTodo(flag)
                     dialog.dismiss()
                     dialog.hide()
+
+                    val randomNum = (1..100).random()
+                    if (randomNum >= 50) {
+                        showAds()
+                        initAds()
+                    }
                 }
             } else {
                 VibrationUtil.vibrate2(requireContext())
@@ -289,7 +332,6 @@ class TodoFragment : Fragment() {
         dialog.window!!.setBackgroundDrawableResource(R.color.transparent)
         dialog.window!!.attributes.windowAnimations = R.style.Bottom_Sheet_Dialog_Anim
         dialog.window!!.setGravity(Gravity.BOTTOM)
-
     }
 
     @SuppressLint("InflateParams")
@@ -297,7 +339,7 @@ class TodoFragment : Fragment() {
         val dialog = BottomSheetDialog(requireContext())
         dialog.window!!.requestFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_bottom_todo_filter)
-        dialog.behavior.peekHeight = 800
+        dialog.behavior.peekHeight = 900
         dialog.behavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
         val colorFilterGray = PorterDuffColorFilter(
@@ -455,13 +497,15 @@ class TodoFragment : Fragment() {
         currentList = todoListViewModel.getTodosList()[0].title
         binding.tvTodoTitleList.text = currentList
 
-        todoViewModel.getTodosList().removeAll {
-            it.list == item.title
+        todoViewModel.getList().forEach { element ->
+            if (element.list == item.title) {
+                todoViewModel.todosList = todoViewModel.getList().minusElement(element)
+            }
         }
-        todoAdapter.updateList(todoViewModel.getTodosList())
+        todoAdapter.updateList(todoViewModel.getList())
 
         pendingCount.clear()
-        todoViewModel.getTodosList().forEach { todo ->
+        todoViewModel.getList().forEach { todo ->
             if (!todo.done && todo.list == currentList) {
                 pendingCount.add(todo)
             }
@@ -480,7 +524,7 @@ class TodoFragment : Fragment() {
         binding.tvTodoTitleList.text = currentList
 
         pendingCount.clear()
-        todoViewModel.getTodosList().forEach { todo ->
+        todoViewModel.getList().forEach { todo ->
             if (!todo.done && todo.list == currentList) {
                 pendingCount.add(todo)
             }
@@ -504,13 +548,13 @@ class TodoFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun deleteTodo(info: TodoInfo) {
-        todoViewModel.getTodosList().removeAt(
-            getTodoById(todoViewModel.getTodosList(), info.id)
+        todoViewModel.todosList = todoViewModel.getList().minusElement(
+            todoViewModel.getList()[getTodoById(todoViewModel.getList(), info.id)]
         )
-        todoAdapter.notifyItemRemoved(getTodoById(todoViewModel.getTodosList(), info.id))
+        todoAdapter.updateList(todoViewModel.getList())
 
         pendingCount.clear()
-        todoViewModel.getTodosList().forEach { item ->
+        todoViewModel.getList().forEach { item ->
             if (!item.done && item.list == currentList) {
                 pendingCount.add(item)
             }
@@ -547,11 +591,15 @@ class TodoFragment : Fragment() {
             it.startAnimation(animation)
             VibrationUtil.vibrate1(requireContext())
 
-            todoViewModel.getTodosList().removeAll { todo -> todo.done && todo.list == currentList }
-            todoAdapter.updateList(todoViewModel.getTodosList())
+            todoViewModel.getList().forEach { item ->
+                if (item.done && item.list == currentList) {
+                    todoViewModel.todosList = todoViewModel.getList().minusElement(item)
+                }
+            }
+            todoAdapter.updateList(todoViewModel.getList())
 
             pendingCount.clear()
-            todoViewModel.getTodosList().forEach { item ->
+            todoViewModel.getList().forEach { item ->
                 if (!item.done && item.list == currentList) {
                     pendingCount.add(item)
                 }
@@ -562,7 +610,14 @@ class TodoFragment : Fragment() {
             todoViewModel.saveTodosToDataStore(requireContext())
             selectFilter()
 
+            dialog.dismiss()
             dialog.hide()
+
+            val randomNum = (1..100).random()
+            if (randomNum >= 50) {
+                showAds()
+                initAds()
+            }
         }
 
         noBtn.setOnClickListener {
@@ -578,12 +633,11 @@ class TodoFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun checkTodo(info: TodoInfo) {
-        todoViewModel.getTodosList()[getTodoById(todoViewModel.getTodosList(), info.id)].done =
-            !todoViewModel.getTodosList()[getTodoById(todoViewModel.getTodosList(), info.id)].done
-        todoAdapter.notifyItemChanged(getTodoById(todoViewModel.getTodosList(), info.id))
+        todoViewModel.checkTask(getTodoById(todoViewModel.getList(), info.id))
+        todoAdapter.updateList(todoViewModel.getList())
 
         pendingCount.clear()
-        todoViewModel.getTodosList().forEach { item ->
+        todoViewModel.getList().forEach { item ->
             if (!item.done && item.list == currentList) {
                 pendingCount.add(item)
             }
@@ -603,11 +657,12 @@ class TodoFragment : Fragment() {
         when (currentFilter) {
             All -> {
                 filteredList.clear()
-                todoViewModel.getTodosList().forEach { item ->
+                todoViewModel.getList().forEach { item ->
                     if (item.list == currentList) {
                         filteredList.add(item)
                     }
                 }
+                todoAdapter.updateList(filteredList.toList())
 
                 if (filteredList.isEmpty()) {
                     binding.tvTodoEmptyList.visibility = View.VISIBLE
@@ -616,17 +671,16 @@ class TodoFragment : Fragment() {
                     binding.tvTodoEmptyList.visibility = View.GONE
                     binding.rvTodosElements.visibility = View.VISIBLE
                 }
-
-                todoAdapter.updateList(filteredList)
             }
 
             Pending -> {
                 filteredList.clear()
-                todoViewModel.getTodosList().forEach { item ->
+                todoViewModel.getList().forEach { item ->
                     if (!item.done && item.list == currentList) {
                         filteredList.add(item)
                     }
                 }
+                todoAdapter.updateList(filteredList.toList())
 
                 if (filteredList.isEmpty()) {
                     binding.tvTodoEmptyPedingList.visibility = View.VISIBLE
@@ -635,17 +689,16 @@ class TodoFragment : Fragment() {
                     binding.tvTodoEmptyPedingList.visibility = View.GONE
                     binding.rvTodosElements.visibility = View.VISIBLE
                 }
-
-                todoAdapter.updateList(filteredList)
             }
 
             else -> {
                 filteredList.clear()
-                todoViewModel.getTodosList().forEach { item ->
+                todoViewModel.getList().forEach { item ->
                     if (item.done && item.list == currentList) {
                         filteredList.add(item)
                     }
                 }
+                todoAdapter.updateList(filteredList.toList())
 
                 if (filteredList.isEmpty()) {
                     binding.tvTodoEmptyCompletedList.visibility = View.VISIBLE
@@ -654,8 +707,6 @@ class TodoFragment : Fragment() {
                     binding.tvTodoEmptyCompletedList.visibility = View.GONE
                     binding.rvTodosElements.visibility = View.VISIBLE
                 }
-
-                todoAdapter.updateList(filteredList)
             }
         }
     }
@@ -690,18 +741,18 @@ class TodoFragment : Fragment() {
 
         addBtn.setOnClickListener {
             if (tiDescInput.text.toString().trim().isNotEmpty()) {
-                val index = getTodoById(todoViewModel.getTodosList(), info.id)
+                val index = getTodoById(todoViewModel.getList(), info.id)
 
                 todoViewModel.editList(tiDescInput.text.toString().trim(), index)
+                todoAdapter.updateList(todoViewModel.getList())
 
-                todoAdapter.updateList(todoViewModel.getTodosList())
                 CoroutineScope(Dispatchers.IO).launch {
                     MainActivity.DataManager(requireContext()).saveTodosList(
-                        todoViewModel.getTodosList()
+                        todoViewModel.getList()
                     )
                 }
-                todoAdapter.notifyItemChanged(index)
 
+                selectFilter()
                 dialog.dismiss()
                 dialog.hide()
             } else {
@@ -740,6 +791,14 @@ class TodoFragment : Fragment() {
             it.startAnimation(animation)
 
             deleteCompleted()
+        }
+
+        interstitialAdMob?.fullScreenContentCallback = object: FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+            }
+            override fun onAdShowedFullScreenContent() {
+                interstitialAdMob = null
+            }
         }
     }
 

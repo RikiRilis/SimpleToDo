@@ -16,19 +16,19 @@ class TodoViewModel @Inject constructor() : ViewModel() {
     private var _todos = MutableStateFlow<List<TodoInfo>>(emptyList())
     val todos: StateFlow<List<TodoInfo>> = _todos
 
-    private var todosList: MutableList<TodoInfo> = ArrayList()
+    var todosList: List<TodoInfo> = listOf()
 
-    fun addTodo(todoInfo: TodoInfo = TodoInfo()): MutableList<TodoInfo> {
+    fun addTodo(todoInfo: TodoInfo = TodoInfo()): List<TodoInfo> {
         if (todosList.isNotEmpty() && todosList[0].timestamp == "Default") {
-            todosList.removeFirst()
+            todosList = todosList.minusElement(todosList[0])
         }
 
-        todosList.add(todoInfo)
+        todosList = todosList.plus(todoInfo)
         _todos.value = todosList
         return todosList
     }
 
-    fun updateAllList(list: MutableList<TodoInfo>) {
+    fun updateAllList(list: List<TodoInfo>) {
         todosList = list
         _todos.value = todosList
     }
@@ -38,13 +38,18 @@ class TodoViewModel @Inject constructor() : ViewModel() {
         _todos.value = todosList
     }
 
-    fun getTodosList(): MutableList<TodoInfo> {
+    fun checkTask(pos: Int) {
+        todosList[pos].done = !todosList[pos].done
+        _todos.value = todosList
+    }
+
+    fun getList(): List<TodoInfo> {
         return todosList
     }
 
     fun saveTodosToDataStore(context: Context) {
         viewModelScope.launch {
-            MainActivity.DataManager(context).saveTodosList(getTodosList())
+            MainActivity.DataManager(context).saveTodosList(getList())
         }
     }
 }

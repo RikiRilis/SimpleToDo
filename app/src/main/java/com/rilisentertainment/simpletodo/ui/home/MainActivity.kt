@@ -22,6 +22,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rilisentertainment.simpletodo.R
@@ -46,11 +49,11 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
     companion object {
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "registry")
-
         const val TODOS_STORE = "todos_store"
         const val TODOS_LIST = "todos_list"
         const val REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1
         const val REQUEST_CODE_READ_EXTERNAL_STORAGE = 2
+        const val INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712" // Change ID
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -102,6 +105,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun initUI() {
         initListeners()
+        initBannerAds()
+    }
+
+    private fun initBannerAds() {
+        val adRequest = AdRequest.Builder().build()
+        binding.avMain.loadAd(adRequest)
+
+        binding.avMain.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                binding.avMain.visibility = View.VISIBLE
+            }
+
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                binding.avMain.visibility = View.GONE
+            }
+
+            override fun onAdOpened() {}
+            override fun onAdClicked() {}
+            override fun onAdClosed() {}
+        }
     }
 
     private fun openFloatingSideMenu(view: View) {
@@ -165,7 +188,7 @@ class MainActivity : AppCompatActivity() {
             return preferences[preferencesKey] ?: ""
         }
 
-        suspend fun saveTodosList(todosList: MutableList<TodoInfo>) {
+        suspend fun saveTodosList(todosList: List<TodoInfo>) {
             val json = Gson().toJson(todosList)
             dataStore.edit { preferences ->
                 preferences[stringPreferencesKey(TODOS_STORE)] = json
@@ -179,11 +202,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        suspend fun getTodosListFromDataStore(): MutableList<TodoInfo> {
+        suspend fun getTodosListFromDataStore(): List<TodoInfo> {
             val todosListKey = stringPreferencesKey(TODOS_STORE)
             val jsonString = dataStore.data.first()[todosListKey]
-            val typeToken = object : TypeToken<MutableList<TodoInfo>>() {}.type
-            return Gson().fromJson(jsonString, typeToken) ?: todosViewModel.getTodosList()
+            val typeToken = object : TypeToken<List<TodoInfo>>() {}.type
+            return Gson().fromJson(jsonString, typeToken) ?: todosViewModel.getList()
         }
 
         suspend fun getCurrentListsFromDataStore(): MutableList<TodoList> {
@@ -224,5 +247,6 @@ class MainActivity : AppCompatActivity() {
             activity.finish()
             activity.startActivity(intent)
         }
+
     }
 }

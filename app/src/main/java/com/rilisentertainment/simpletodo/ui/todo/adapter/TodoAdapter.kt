@@ -1,11 +1,12 @@
 package com.rilisentertainment.simpletodo.ui.todo.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rilisentertainment.simpletodo.R
 import com.rilisentertainment.simpletodo.domain.TodoInfo
+import com.rilisentertainment.simpletodo.domain.diffutil.TodoInfoDiffUtil
 
 class TodoAdapter(
     private var todosList: List<TodoInfo> = emptyList(),
@@ -13,11 +14,11 @@ class TodoAdapter(
     private val onItemChecked: (TodoInfo) -> Unit,
     private val onLongItemSelected: (TodoInfo) -> Unit
 ) : RecyclerView.Adapter<TodoViewHolder>() {
-    @SuppressLint("NotifyDataSetChanged")
     fun updateList(list: List<TodoInfo>) {
+        val listDiffUtil = TodoInfoDiffUtil(list, todosList)
+        val result = DiffUtil.calculateDiff(listDiffUtil)
         todosList = list
-
-        notifyDataSetChanged()
+        result.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
