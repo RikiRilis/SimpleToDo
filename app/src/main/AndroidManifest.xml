@@ -10,8 +10,8 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    
     <application
         android:name=".SimpleTodoApp"
         android:allowBackup="true"
@@ -48,10 +48,9 @@
             android:configChanges="orientation|screenSize"
             android:exported="true" />
 
-        <!--        AppID: Change value before publishing-->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-5333671658707378~6821343388" />
     </application>
 
 </manifest>

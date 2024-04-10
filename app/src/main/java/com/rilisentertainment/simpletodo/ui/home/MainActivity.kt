@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         const val TODOS_LIST = "todos_list"
         const val REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1
         const val REQUEST_CODE_READ_EXTERNAL_STORAGE = 2
-        const val INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712" // Change ID
+        const val INTERSTITIAL_ID = "ca-app-pub-5333671658707378/4259793060"
     }
 
     private lateinit var binding: ActivityMainBinding
