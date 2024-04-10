@@ -14,7 +14,7 @@ android {
         applicationId = "com.rilisentertainment.simpletodo"
         minSdk = 26
         targetSdk = 34
-        versionCode = 4
+        versionCode = 8
         versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -22,8 +22,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

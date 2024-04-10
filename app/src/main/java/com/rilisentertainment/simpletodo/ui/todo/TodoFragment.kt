@@ -628,7 +628,7 @@ class TodoFragment : Fragment() {
             dialog.hide()
         }
 
-        if(pendingCount.size != 0) dialog.show()
+        if(todoViewModel.getList().any { it.done }) dialog.show()
     }
 
     @SuppressLint("SetTextI18n")
