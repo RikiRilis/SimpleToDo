@@ -33,6 +33,13 @@ class TodoViewModel @Inject constructor() : ViewModel() {
         _todos.value = todosList
     }
 
+    fun restoreList(list: List<TodoInfo>) {
+        list.forEach { item ->
+            todosList = todosList.plus(item)
+        }
+        _todos.value = todosList
+    }
+
     fun editList(desc: String, pos: Int) {
         todosList[pos].desc = desc
         _todos.value = todosList

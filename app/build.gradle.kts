@@ -14,8 +14,8 @@ android {
         applicationId = "com.rilisentertainment.simpletodo"
         minSdk = 26
         targetSdk = 34
-        versionCode = 8
-        versionName = "1.2"
+        versionCode = 9
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

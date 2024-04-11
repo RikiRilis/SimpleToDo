@@ -144,7 +144,15 @@ class TodoSettingsActivity : AppCompatActivity() {
 
     private fun restoreList(list: List<TodoInfo>) {
         val newTodoListInfo: MutableList<TodoList> = todoListViewModel.getTodosList()
-        todoViewModel.updateAllList(list)
+        val todoListToRestore: MutableList<TodoInfo> = mutableListOf()
+
+        list.forEach { item ->
+            if (!todoViewModel.getList().any { it.id == item.id }) {
+                todoListToRestore.add(item)
+            }
+        }
+
+        todoViewModel.restoreList(todoListToRestore)
         todoViewModel.getList().forEach { item ->
             if (
                 !todoListViewModel.getTodosList().any { it.title == item.list } &&
@@ -200,6 +208,10 @@ class TodoSettingsActivity : AppCompatActivity() {
             e.printStackTrace()
             Toast.makeText(this, this.getString(R.string.backup_error), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun getTodoById(info: List<TodoInfo>, id: String): Int {
+        return info.indexOfFirst { it.id == id }
     }
 
     private fun initListeners() {

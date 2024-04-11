@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @SuppressLint("CustomSplashScreen")
 class SplashScreenActivity : AppCompatActivity() {
@@ -25,7 +26,7 @@ class SplashScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
 
-        currentLanguage = resources.configuration.locales[0].language
+        currentLanguage = Locale.getDefault().language
 
         CoroutineScope(Dispatchers.IO).launch {
             MainActivity.DataManager(this@SplashScreenActivity).getSettings()

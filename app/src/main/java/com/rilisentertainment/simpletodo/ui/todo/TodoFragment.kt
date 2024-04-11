@@ -35,8 +35,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.rilisentertainment.simpletodo.data.usecase.VibrationUtil
 import com.rilisentertainment.simpletodo.R
+import com.rilisentertainment.simpletodo.data.usecase.VibrationUtil
 import com.rilisentertainment.simpletodo.databinding.FragmentTodoBinding
 import com.rilisentertainment.simpletodo.domain.TodoInfo
 import com.rilisentertainment.simpletodo.domain.TodoList
@@ -103,6 +103,7 @@ class TodoFragment : Fragment() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     interstitialAdMob = interstitialAd
                 }
+
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     interstitialAdMob = null
                 }
@@ -496,6 +497,12 @@ class TodoFragment : Fragment() {
 
         currentList = todoListViewModel.getTodosList()[0].title
         binding.tvTodoTitleList.text = currentList
+        CoroutineScope(Dispatchers.IO).launch {
+            MainActivity.DataManager(requireContext()).saveStrings(
+                CURRENT_LIST,
+                currentList
+            )
+        }
 
         todoViewModel.getList().forEach { element ->
             if (element.list == item.title) {
@@ -514,7 +521,11 @@ class TodoFragment : Fragment() {
             "${pendingCount.size} ${requireContext().getString(R.string.todos_count)}"
 
         todoListViewModel.saveLists(requireContext())
-        todoViewModel.saveTodosToDataStore(requireContext())
+        CoroutineScope(Dispatchers.IO).launch {
+            MainActivity.DataManager(requireContext())
+                .saveCurrentTodosList(todoListViewModel.getTodosList())
+            MainActivity.DataManager(requireContext()).saveTodosList(todoViewModel.getList())
+        }
         selectFilter()
     }
 
@@ -628,7 +639,7 @@ class TodoFragment : Fragment() {
             dialog.hide()
         }
 
-        if(todoViewModel.getList().any { it.done }) dialog.show()
+        if (todoViewModel.getList().any { it.done }) dialog.show()
     }
 
     @SuppressLint("SetTextI18n")
@@ -793,9 +804,10 @@ class TodoFragment : Fragment() {
             deleteCompleted()
         }
 
-        interstitialAdMob?.fullScreenContentCallback = object: FullScreenContentCallback() {
+        interstitialAdMob?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
             }
+
             override fun onAdShowedFullScreenContent() {
                 interstitialAdMob = null
             }
@@ -804,7 +816,7 @@ class TodoFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentTodoBinding.inflate(layoutInflater, container, false)
 
