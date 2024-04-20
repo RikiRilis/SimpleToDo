@@ -7,21 +7,21 @@
     <color name="red">#aa1111</color>
     <color name="green">#117711</color>
 
+    <color name="appNameColor">#AC5229</color>
     <color name="primaryColor">#AC5229</color>
     <color name="secondaryColor">#F4E5D9</color>
     <color name="accent">#AC5229</color>
-    <color name="top">#AC5229</color>
     <color name="top_txt">#FFFBFB</color>
-    <color name="top_txt2">#AC5229</color>
+    <color name="top_txt2">#0B0300</color>
     <color name="top_txt3">#AC5229</color>
-    <color name="top_brand">#FFFBFB</color>
-    <color name="bottom">#FFFBFB</color>
-    <color name="main_bg">#FFFBFB</color>
+    <color name="top_brand">#FFFFFF</color>
+    <color name="bottom">#FFFFFF</color>
+    <color name="main_bg">#FFFFFF</color>
     <color name="main_bg2">#E6E6E6</color>
     <color name="main_bg3">#F4F4F4</color>
     <color name="main_bg4">#25DFBDAA</color>
     <color name="switch_track_color">#F4E4D9</color>
-    <color name="dialogs_bg">#ECECEC</color>
+    <color name="dialogs_bg">@color/main_txt17</color>
     <color name="second_action_button">#F4E5D9</color>
 
     <color name="main_txt1">#AC5229</color>

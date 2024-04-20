@@ -18,14 +18,13 @@ class TodoViewModel @Inject constructor() : ViewModel() {
 
     var todosList: List<TodoInfo> = listOf()
 
-    fun addTodo(todoInfo: TodoInfo = TodoInfo()): List<TodoInfo> {
+    fun addTodo(todoInfo: TodoInfo = TodoInfo()) {
         if (todosList.isNotEmpty() && todosList[0].timestamp == "Default") {
             todosList = todosList.minusElement(todosList[0])
         }
 
         todosList = todosList.plus(todoInfo)
         _todos.value = todosList
-        return todosList
     }
 
     fun updateAllList(list: List<TodoInfo>) {

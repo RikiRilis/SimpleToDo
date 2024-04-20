@@ -6,48 +6,31 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_bg"
+    android:background="@color/main_txt15"
     tools:context=".ui.home.MainActivity">
 
     <LinearLayout
         android:id="@+id/llTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/top"
+        android:background="@color/main_bg"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:id="@+id/ivBrand"
-            android:layout_width="58dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingStart="20dp"
-            tools:ignore="RtlSymmetry">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_brand"
-                app:tint="@color/top_brand" />
-
-        </LinearLayout>
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginVertical="18dp"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="20dp"
             android:layout_weight="1"
             android:maxLines="1"
+            android:textStyle="bold"
             android:singleLine="true"
             android:text="@string/app_name"
-            android:textColor="@color/top_txt"
+            android:textColor="@color/appNameColor"
             android:textSize="24sp" />
 
         <LinearLayout
@@ -64,7 +47,7 @@
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/settings"
                 android:src="@drawable/ic_menu"
-                app:tint="@color/top_txt" />
+                app:tint="@color/top_txt2" />
 
         </LinearLayout>
 
@@ -75,6 +58,7 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="0.8dp"
         ads:layout_constraintBottom_toTopOf="@id/avMain"
         app:defaultNavHost="true"
         app:layout_constraintEnd_toEndOf="parent"

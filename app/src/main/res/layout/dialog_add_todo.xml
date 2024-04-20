@@ -61,7 +61,6 @@
             android:baselineAligned="false">
 
             <com.google.android.material.textfield.TextInputLayout
-
                 android:id="@+id/acListAutoCompleteParent"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"

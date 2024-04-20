@@ -66,4 +66,5 @@
     <string name="pending_tasks">You have pending task(s):</string>
     <string name="notifications">Notifications</string>
     <string name="notifications_desc">Turn on/Turn off notifications.</string>
+    <string name="not_delete_completed_warning">You don\'t have any completed tasks on this list to delete.</string>
 </resources>

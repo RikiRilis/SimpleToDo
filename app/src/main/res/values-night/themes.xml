@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.SimpleToDo" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@color/top</item>
-        <item name="android:navigationBarColor">@color/top</item>
+        <item name="android:statusBarColor">@color/main_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/main_bg</item>
         <item name="android:indeterminateTint">@color/accent</item>
         <item name="android:colorEdgeEffect">@color/main_bg4</item>
         <item name="android:textColorHighlight">@color/main_bg4</item>
@@ -15,10 +16,13 @@
     <style name="Theme.SimpleToDo" parent="Base.Theme.SimpleToDo" />
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/main_bg2</item>
+        <item name="windowSplashScreenBackground">@color/main_bg</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground_108px</item>
         <item name="windowSplashScreenAnimationDuration">300</item>
         <item name="postSplashScreenTheme">@style/Base.Theme.SimpleToDo</item>
+        <item name="android:statusBarColor">@color/main_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/main_bg</item>
     </style>
 
     <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">

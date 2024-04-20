@@ -101,7 +101,6 @@ class TodoSettingsActivity : AppCompatActivity() {
         } else if (requestCode == REQUEST_CODE_PICK_JSON && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
                 contentResolver.openInputStream(uri)?.use { inputStream ->
-                    val context = this
                     val json = inputStream.bufferedReader().use { it.readText() }
                     val typeToken = object : TypeToken<List<TodoInfo>>() {}.type
                     val newList = Gson().fromJson(
@@ -115,12 +114,6 @@ class TodoSettingsActivity : AppCompatActivity() {
                         showAds()
                         initAds()
                     }
-
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.list_restored),
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
         } else {
@@ -131,6 +124,11 @@ class TodoSettingsActivity : AppCompatActivity() {
     private fun listRestoredCheck(list: List<TodoInfo>) {
         if (list[0].type == "TodoList" && list.all { it.type.isNotEmpty() }) {
             restoreList(list)
+            Toast.makeText(
+                this,
+                this.getString(R.string.list_restored),
+                Toast.LENGTH_SHORT
+            ).show()
         } else {
             Toast.makeText(
                 this,

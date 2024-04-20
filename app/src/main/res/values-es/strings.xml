@@ -66,4 +66,5 @@
     <string name="pending_tasks">Tienes tarea(s) pendiente(s):</string>
     <string name="notifications">Notificaciones</string>
     <string name="notifications_desc">Activa/Desactiva las notificaciones.</string>
+    <string name="not_delete_completed_warning">No tienes ninguna tarea completada para eliminar en esta lista.</string>
 </resources>

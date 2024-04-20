@@ -19,6 +19,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -639,7 +640,22 @@ class TodoFragment : Fragment() {
             dialog.hide()
         }
 
-        if (todoViewModel.getList().any { it.done }) dialog.show()
+        if (todoViewModel.getList().filter { it.list == currentList }.any { it.done }) {
+            dialog.show()
+        } else {
+            val layoutInflater = layoutInflater
+            val layout = layoutInflater.inflate(
+                R.layout.toast_top,
+                requireView().findViewById(R.id.toast_top)
+            )
+            val textView = layout.findViewById<TextView>(R.id.tvToast)
+            textView.text = requireContext().getString(R.string.not_delete_completed_warning)
+
+            val toast = Toast(requireContext())
+            toast.duration = Toast.LENGTH_SHORT
+            toast.view = layout
+            toast.show()
+        }
     }
 
     @SuppressLint("SetTextI18n")

@@ -14,7 +14,7 @@ object VibrationUtil {
 
     fun vibrate1(context: Context) {
         val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        val vibrationEffect = VibrationEffect.createOneShot(15, VibrationEffect.DEFAULT_AMPLITUDE)
+        val vibrationEffect = VibrationEffect.createOneShot(3, VibrationEffect.DEFAULT_AMPLITUDE)
 
         CoroutineScope(Dispatchers.IO).launch {
             MainActivity.DataManager(context).getSettings().collect {
@@ -29,7 +29,7 @@ object VibrationUtil {
 
     fun vibrate2(context: Context) {
         val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        val vibrationEffect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
+        val vibrationEffect = VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE)
 
         CoroutineScope(Dispatchers.IO).launch {
             MainActivity.DataManager(context).getSettings().collect {
