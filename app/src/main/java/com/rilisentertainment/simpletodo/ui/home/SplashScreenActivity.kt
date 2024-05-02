@@ -26,6 +26,8 @@ class SplashScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
 
+        splashScreen.setKeepOnScreenCondition { true }
+
         currentLanguage = Locale.getDefault().language
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -74,7 +76,6 @@ class SplashScreenActivity : AppCompatActivity() {
                 }
         }
 
-        splashScreen.setKeepOnScreenCondition { true }
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()

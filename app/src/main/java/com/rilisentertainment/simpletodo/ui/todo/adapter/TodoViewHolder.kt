@@ -1,5 +1,6 @@
 package com.rilisentertainment.simpletodo.ui.todo.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Paint
 import android.view.View
@@ -7,29 +8,32 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.rilisentertainment.simpletodo.data.usecase.VibrationUtil
 import com.rilisentertainment.simpletodo.R
+import com.rilisentertainment.simpletodo.data.usecase.VibrationUtil
 import com.rilisentertainment.simpletodo.databinding.ItemTodoModelBinding
 import com.rilisentertainment.simpletodo.domain.TodoInfo
 
-class TodoViewHolder(view: View): RecyclerView.ViewHolder(view) {
+class TodoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val binding = ItemTodoModelBinding.bind(view)
     val context: Context = binding.tvTodoDesc.context
 
+    @SuppressLint("SetTextI18n")
     fun render(
         todosInfo: TodoInfo,
         onItemRemove: (TodoInfo) -> Unit,
         onItemChecked: (TodoInfo) -> Unit,
-        onLongItemSelected: (TodoInfo) -> Unit
+        onLongItemSelected: (TodoInfo) -> Unit,
     ) {
         val checkTextColor = ContextCompat.getColor(context, R.color.main_txt11)
         val noCheckTextColor = ContextCompat.getColor(context, R.color.main_txt4)
 
         binding.tvTodoDesc.text = todosInfo.desc
-        binding.tvTodoTimestamp.text = todosInfo.timestamp
+        binding.tvTodoTimestamp.text =
+            "${context.getString(R.string.reg_created_timestamp)} ${todosInfo.timestamp}"
         if (todosInfo.done) {
             binding.ivTodoCompletedImage.visibility = View.VISIBLE
-            binding.tvTodoDesc.paintFlags = binding.tvTodoDesc.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            binding.tvTodoDesc.paintFlags =
+                binding.tvTodoDesc.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             binding.tvTodoDesc.setTextColor(checkTextColor)
         } else {
             binding.ivTodoCompletedImage.visibility = View.GONE

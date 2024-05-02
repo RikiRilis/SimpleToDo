@@ -208,10 +208,6 @@ class TodoSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun getTodoById(info: List<TodoInfo>, id: String): Int {
-        return info.indexOfFirst { it.id == id }
-    }
-
     private fun initListeners() {
         binding.ivSettingsBack.setOnClickListener {
             val animation: Animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)

@@ -67,4 +67,5 @@
     <string name="notifications">Notifications</string>
     <string name="notifications_desc">Turn on/Turn off notifications.</string>
     <string name="not_delete_completed_warning">You don\'t have any completed tasks on this list to delete.</string>
+    <string name="delete_list_advertisement">If you delete this list, it cannot be restored again and all tasks related to it will be deleted. Are you sure you want to delete this list?</string>
 </resources>

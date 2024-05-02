@@ -5,7 +5,7 @@
     <string name="to_do">To-Do</string>
     <string name="delete">Eliminar</string>
     <string name="saved">Guardado</string>
-    <string name="empty_todo_list_desc">You don\'t have things to do.</string>
+    <string name="empty_todo_list_desc">No tienes tareas agregadas.</string>
     <string name="all">Todos</string>
     <string name="pending">Pendientes</string>
     <string name="completed">Completados</string>
@@ -67,4 +67,5 @@
     <string name="notifications">Notificaciones</string>
     <string name="notifications_desc">Activa/Desactiva las notificaciones.</string>
     <string name="not_delete_completed_warning">No tienes ninguna tarea completada para eliminar en esta lista.</string>
+    <string name="delete_list_advertisement">Al eliminar esta lista, no serás capaz de recuperarla y también se eliminarán todas las tareas asociadas a esta lista. ¿Estás seguro/a de que deseas eliminar esta lista?</string>
 </resources>

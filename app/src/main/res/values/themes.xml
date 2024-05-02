@@ -36,7 +36,6 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_weight">1</item>
         <item name="android:maxLines">1</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/top_txt2</item>
         <item name="android:paddingVertical">16dp</item>
     </style>

@@ -2,6 +2,7 @@ package com.rilisentertainment.simpletodo.ui.todo
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -253,9 +255,7 @@ class TodoFragment : Fragment() {
                 todoViewModel.addTodo(
                     TodoInfo(
                         desc = tiDescInput.text.toString().trim(),
-                        timestamp = requireContext().getString(R.string.reg_created_timestamp) + " " + dateFormat.format(
-                            currentDate
-                        ),
+                        timestamp = dateFormat.format(currentDate),
                         list = itemSelected
                     )
                 )
@@ -285,6 +285,14 @@ class TodoFragment : Fragment() {
         val btnAddList: Button = dialog.findViewById(R.id.btnDialogAddListBtn)!!
 
         etInput.requestFocus()
+        val inputMethodManager = requireActivity().getSystemService(
+            Context.INPUT_METHOD_SERVICE
+        ) as InputMethodManager
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+
+        dialog.setOnDismissListener {
+            inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+        }
 
         btnAddList.setOnClickListener {
             if (etInput.text.toString().trim() != "") {
@@ -480,54 +488,82 @@ class TodoFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun listRemove(item: TodoList) {
-        todoListViewModel.getTodosList().removeAt(
-            getListByName(todoListViewModel.getTodosList(), item.title)
-        )
-        todoListAdapter.updateList(todoListViewModel.getTodosList())
-        todoListAdapter.notifyItemRemoved(
-            getListByName(
-                todoListViewModel.getTodosList(),
-                item.title
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_list_delete)
+        dialog.window!!.setBackgroundDrawableResource(R.color.transparent)
+        dialog.window!!.setElevation(1F)
+        dialog.window!!.decorView.scaleX = 0.5F
+        dialog.window!!.decorView.scaleY = 0.5F
+        dialog.window!!.decorView
+            .animate()
+            .setDuration(200)
+            .scaleX(1F)
+            .scaleY(1F)
+            .start()
+
+        val tvDelete = dialog.findViewById<TextView>(R.id.tvDialogDelete)
+        val tvCancel = dialog.findViewById<TextView>(R.id.tvDialogCancel)
+
+        tvDelete.setOnClickListener {
+            todoListViewModel.getTodosList().removeAt(
+                getListByName(todoListViewModel.getTodosList(), item.title)
             )
-        )
-
-        if (todoListViewModel.getTodosList().isEmpty()) {
-            todoListViewModel.addList()
-            todoListAdapter.notifyItemInserted(0)
-        }
-
-        currentList = todoListViewModel.getTodosList()[0].title
-        binding.tvTodoTitleList.text = currentList
-        CoroutineScope(Dispatchers.IO).launch {
-            MainActivity.DataManager(requireContext()).saveStrings(
-                CURRENT_LIST,
-                currentList
+            todoListAdapter.updateList(todoListViewModel.getTodosList())
+            todoListAdapter.notifyItemRemoved(
+                getListByName(
+                    todoListViewModel.getTodosList(),
+                    item.title
+                )
             )
-        }
 
-        todoViewModel.getList().forEach { element ->
-            if (element.list == item.title) {
-                todoViewModel.todosList = todoViewModel.getList().minusElement(element)
+            if (todoListViewModel.getTodosList().isEmpty()) {
+                todoListViewModel.addList()
+                todoListAdapter.notifyItemInserted(0)
             }
-        }
-        todoAdapter.updateList(todoViewModel.getList())
 
-        pendingCount.clear()
-        todoViewModel.getList().forEach { todo ->
-            if (!todo.done && todo.list == currentList) {
-                pendingCount.add(todo)
+            currentList = todoListViewModel.getTodosList()[0].title
+            binding.tvTodoTitleList.text = currentList
+            CoroutineScope(Dispatchers.IO).launch {
+                MainActivity.DataManager(requireContext()).saveStrings(
+                    CURRENT_LIST,
+                    currentList
+                )
             }
-        }
-        binding.tvTodosCount.text =
-            "${pendingCount.size} ${requireContext().getString(R.string.todos_count)}"
 
-        todoListViewModel.saveLists(requireContext())
-        CoroutineScope(Dispatchers.IO).launch {
-            MainActivity.DataManager(requireContext())
-                .saveCurrentTodosList(todoListViewModel.getTodosList())
-            MainActivity.DataManager(requireContext()).saveTodosList(todoViewModel.getList())
+            todoViewModel.getList().forEach { element ->
+                if (element.list == item.title) {
+                    todoViewModel.todosList = todoViewModel.getList().minusElement(element)
+                }
+            }
+            todoAdapter.updateList(todoViewModel.getList())
+
+            pendingCount.clear()
+            todoViewModel.getList().forEach { todo ->
+                if (!todo.done && todo.list == currentList) {
+                    pendingCount.add(todo)
+                }
+            }
+            binding.tvTodosCount.text =
+                "${pendingCount.size} ${requireContext().getString(R.string.todos_count)}"
+
+            todoListViewModel.saveLists(requireContext())
+            CoroutineScope(Dispatchers.IO).launch {
+                MainActivity.DataManager(requireContext())
+                    .saveCurrentTodosList(todoListViewModel.getTodosList())
+                MainActivity.DataManager(requireContext()).saveTodosList(todoViewModel.getList())
+            }
+            selectFilter()
+
+            dialog.dismiss()
+            dialog.hide()
         }
-        selectFilter()
+
+        tvCancel.setOnClickListener {
+            dialog.dismiss()
+            dialog.hide()
+        }
+
+        dialog.show()
     }
 
     @SuppressLint("SetTextI18n")
